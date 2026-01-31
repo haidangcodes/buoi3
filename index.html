@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Dashboard - Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000000;
+            --secondary: #ffffff;
+            --accent: #ff3366;
+            --accent-light: #ff6b8a;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f5;
+            --gray-200: #eeeeee;
+            --gray-300: #e0e0e0;
+            --gray-400: #bdbdbd;
+            --gray-600: #757575;
+            --gray-800: #424242;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+            color: var(--primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+        header {
+            background: var(--primary);
+            color: var(--secondary);
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(45deg, var(--accent) 0%, transparent 70%);
+            opacity: 0.1;
+        }
+
+        header h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 4rem;
+            letter-spacing: 3px;
+            text-align: center;
+            position: relative;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        header p { text-align: center; font-size: 1.1rem; opacity: 0.8; position: relative; animation: fadeIn 0.8s ease-out 0.2s both; }
+
+        @keyframes slideDown { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .controls {
+            background: var(--secondary);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .control-group { display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .control-group label {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.3rem;
+            letter-spacing: 1px;
+            color: var(--gray-800);
+        }
+
+        .search-box { position: relative; }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            padding-left: 2.75rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(255, 51, 102, 0.1);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .sort-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+
+        .btn {
+            padding: 0.75rem 1.25rem;
+            border: 2px solid var(--primary);
+            background: var(--secondary);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: var(--primary);
+            transition: left 0.3s ease;
+            z-index: 0;
+        }
+
+        .btn span { position: relative; z-index: 1; }
+
+        .btn:hover::before { left: 0; }
+        .btn:hover { color: var(--secondary); }
+
+        .btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: var(--secondary);
+        }
+
+        .btn.active::before { left: 0; background: var(--accent-light); }
+
+        .pagination-controls {
+            background: var(--secondary);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .items-per-page { display: flex; gap: 1rem; align-items: center; }
+
+        .items-per-page label { font-family: 'Bebas Neue', cursive; font-size: 1.3rem; letter-spacing: 1px; }
+
+        .items-per-page select {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-300);
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .pagination { display: flex; gap: 0.5rem; align-items: center; }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--gray-300);
+            background: var(--secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button:hover:not(:disabled) { background: var(--primary); color: var(--secondary); }
+        .pagination button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .pagination .page-info { padding: 0 1rem; font-weight: 600; font-size: 1.2rem; }
+
+        .table-container {
+            background: var(--secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        thead { background: var(--primary); color: var(--secondary); }
+
+        thead th { padding: 1.25rem 1rem; text-align: left; font-size: 1.3rem; }
+
+        tbody tr:nth-child(odd) { background: var(--secondary); }
+        tbody tr:nth-child(even) { background: var(--gray-50); }
+
+        tbody tr:hover {
+            background: linear-gradient(90deg, rgba(255, 51, 102, 0.05) 0%, transparent 100%);
+            transform: scale(1.01);
+        }
+
+        tbody td { padding: 1rem; font-size: 0.95rem; }
+
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .product-image:hover { transform: scale(2.5); z-index: 10; }
+
+        .product-title { font-weight: 600; max-width: 300px; }
+        .product-description {
+            color: var(--gray-600);
+            max-width: 400px;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .product-price { font-family: 'Bebas Neue', cursive; font-size: 1.5rem; color: var(--accent); }
+
+        .category-badge {
+            padding: 0.375rem 0.875rem;
+            background: var(--primary);
+            color: var(--secondary);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .loading, .empty-state { text-align: center; padding: 4rem 2rem; font-size: 1.2rem; color: var(--gray-600); }
+
+        .loading::after { content: '...'; animation: dots 1.5s steps(4, end) infinite; }
+
+        @keyframes dots { 0%,20% { content: '.'; } 40% { content: '..'; } 60%,100% { content: '...'; } }
+
+        .stats {
+            background: var(--secondary);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .stat-value { font-family: 'Bebas Neue', cursive; font-size: 2.5rem; color: var(--accent); }
+
+        @media (max-width: 1024px) { .controls { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) {
+            header h1 { font-size: 2.5rem; }
+            .pagination-controls { flex-direction: column; gap: 1.5rem; }
+            .table-container { overflow-x: auto; }
+            table { min-width: 800px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Product Dashboard</h1>
+            <p>Modern Management System</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stat-item"><div class="stat-value" id="totalProducts">0</div><div class="stat-label">Total Products</div></div>
+            <div class="stat-item"><div class="stat-value" id="displayedProducts">0</div><div class="stat-label">Displayed</div></div>
+            <div class="stat-item"><div class="stat-value" id="currentPage">1</div><div class="stat-label">Current Page</div></div>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="searchInput">Search Products</label>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Tìm kiếm theo tên sản phẩm...">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Sort Options</label>
+                <div class="sort-buttons">
+                    <button class="btn" id="sortPriceAsc"><span>💰 Price ↑</span></button>
+                    <button class="btn" id="sortPriceDesc"><span>💰 Price ↓</span></button>
+                    <button class="btn" id="sortNameAsc"><span>🔤 Name A-Z</span></button>
+                    <button class="btn" id="sortNameDesc"><span>🔤 Name Z-A</span></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination-controls">
+            <div class="items-per-page">
+                <label for="itemsPerPage">Items per page:</label>
+                <select id="itemsPerPage">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
+
+            <div class="pagination">
+                <button id="prevPage">← Prev</button>
+                <span class="page-info">Page <span id="pageNumber">1</span> of <span id="totalPages">1</span></span>
+                <button id="nextPage">Next →</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <tr><td colspan="6" class="loading">Đang tải sản phẩm từ API...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="api.js"></script>
+    <script>
+        let allProducts = [];
+        let filteredProducts = [];
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let currentSort = { field: null, direction: null };
+
+        const searchInput          = document.getElementById('searchInput');
+        const itemsPerPageSelect   = document.getElementById('itemsPerPage');
+        const prevPageBtn          = document.getElementById('prevPage');
+        const nextPageBtn          = document.getElementById('nextPage');
+        const pageNumberSpan       = document.getElementById('pageNumber');
+        const totalPagesSpan       = document.getElementById('totalPages');
+        const productTableBody     = document.getElementById('productTableBody');
+        const totalProductsSpan    = document.getElementById('totalProducts');
+        const displayedProductsSpan= document.getElementById('displayedProducts');
+        const currentPageSpan      = document.getElementById('currentPage');
+
+        const sortPriceAscBtn  = document.getElementById('sortPriceAsc');
+        const sortPriceDescBtn = document.getElementById('sortPriceDesc');
+        const sortNameAscBtn   = document.getElementById('sortNameAsc');
+        const sortNameDescBtn  = document.getElementById('sortNameDesc');
+
+        function applySort(products) {
+            if (!currentSort.field) return products;
+            return [...products].sort((a, b) => {
+                if (currentSort.field === 'price') {
+                    return currentSort.direction === 'asc' ? a.price - b.price : b.price - a.price;
+                }
+                if (currentSort.field === 'title') {
+                    return currentSort.direction === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title);
+                }
+                return 0;
+            });
+        }
+
+        function getFirstImage(product) {
+            if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+                let img = product.images[0];
+                if (typeof img === 'string' && img.startsWith('http')) {
+                    console.log(`[API Image] ID ${product.id}: ${img}`);
+                    return img;
+                }
+            }
+            const fallback = `https://picsum.photos/seed/product-${product.id}/80/80`;
+            console.log(`[Fallback] ID ${product.id}: ${fallback} (no valid image from API)`);
+            return fallback;
+        }
+
+        async function init() {
+            try {
+                allProducts = await ProductAPI.getAllProducts();
+                console.log(`Tổng sản phẩm tải về: ${allProducts.length}`);
+                if (allProducts.length > 0) {
+                    console.log('Ảnh của sản phẩm đầu tiên:', allProducts[0].images?.[0] || 'Không có ảnh');
+                }
+                filteredProducts = applySort([...allProducts]);
+                currentPage = 1;
+                updateAll();
+            } catch (error) {
+                productTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            ❌ Lỗi tải dữ liệu từ API<br>
+                            <small>${error.message}</small>
+                        </td>
+                    </tr>
+                `;
+                console.error('Lỗi API:', error);
+            }
+        }
+
+        function updateAll() {
+            updateStats();
+            renderTable();
+            updatePagination();
+        }
+
+        function updateStats() {
+            totalProductsSpan.textContent = allProducts.length;
+            displayedProductsSpan.textContent = filteredProducts.length;
+            currentPageSpan.textContent = currentPage;
+        }
+
+        function renderTable() {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageItems = filteredProducts.slice(start, end);
+
+            if (pageItems.length === 0) {
+                productTableBody.innerHTML = `<tr><td colspan="6" class="empty-state">Không tìm thấy sản phẩm</td></tr>`;
+                return;
+            }
+
+            productTableBody.innerHTML = pageItems.map(product => `
+                <tr>
+                    <td>${product.id}</td>
+                    <td>
+                        <img 
+                            src="${getFirstImage(product)}" 
+                            alt="${product.title.replace(/"/g, '&quot;')}"
+                            class="product-image"
+                            loading="lazy"
+                            onerror="this.src='https://picsum.photos/80/80?blur=2'; console.warn('Ảnh lỗi cho sản phẩm ${product.id}: ' + this.src);"
+                        >
+                    </td>
+                    <td class="product-title" title="${product.title}">${product.title}</td>
+                    <td class="product-description" title="${(product.description || '').replace(/"/g, '&quot;')}">${product.description || 'Không có mô tả'}</td>
+                    <td class="product-price">$${product.price.toLocaleString()}</td>
+                    <td><span class="category-badge">${product.category?.name || 'Uncategorized'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage) || 1;
+            totalPagesSpan.textContent = totalPages;
+            pageNumberSpan.textContent = currentPage;
+            prevPageBtn.disabled = currentPage <= 1;
+            nextPageBtn.disabled = currentPage >= totalPages;
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            let result = allProducts.filter(p => p.title.toLowerCase().includes(term));
+            filteredProducts = applySort(result);
+            currentPage = 1;
+            updateAll();
+        });
+
+        itemsPerPageSelect.addEventListener('change', (e) => {
+            itemsPerPage = parseInt(e.target.value);
+            currentPage = 1;
+            updateAll();
+        });
+
+        prevPageBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; updateAll(); } });
+        nextPageBtn.addEventListener('click', () => {
+            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+            if (currentPage < totalPages) { currentPage++; updateAll(); }
+        });
+
+        function setActiveSort(button) {
+            [sortPriceAscBtn, sortPriceDescBtn, sortNameAscBtn, sortNameDescBtn].forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+        }
+
+        sortPriceAscBtn.addEventListener('click', () => {
+            currentSort = { field: 'price', direction: 'asc' };
+            setActiveSort(sortPriceAscBtn);
+            filteredProducts = applySort(filteredProducts);
+            currentPage = 1;
+            updateAll();
+        });
+
+        sortPriceDescBtn.addEventListener('click', () => {
+            currentSort = { field: 'price', direction: 'desc' };
+            setActiveSort(sortPriceDescBtn);
+            filteredProducts = applySort(filteredProducts);
+            currentPage = 1;
+            updateAll();
+        });
+
+        sortNameAscBtn.addEventListener('click', () => {
+            currentSort = { field: 'title', direction: 'asc' };
+            setActiveSort(sortNameAscBtn);
+            filteredProducts = applySort(filteredProducts);
+            currentPage = 1;
+            updateAll();
+        });
+
+        sortNameDescBtn.addEventListener('click', () => {
+            currentSort = { field: 'title', direction: 'desc' };
+            setActiveSort(sortNameDescBtn);
+            filteredProducts = applySort(filteredProducts);
+            currentPage = 1;
+            updateAll();
+        });
+
+        // Khởi động dashboard
+        init();
+    </script>
+</body>
+</html>
